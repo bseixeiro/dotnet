@@ -1,0 +1,7 @@
+@model IEnumerable<Student>
+
+<ul>
+@foreach (Student student in Model){
+    <li>@student.name</li>
+}
+</ul>
