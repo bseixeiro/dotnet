@@ -1,18 +1,24 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+
 using mvc.Models;
 
-namespace mvc.Controllers;
-
-public class StudentController : Controller
+namespace mvc.Controllers
 {
-    private static List<Student> students = new(){
-            new Student(){name="Doe", firstname="John", age=40, startDate = new DateTime(2021, 9, 9)},
-            new Student(){name="Seixeiro", firstname="Benjamin", age=20, startDate = new DateTime(2021, 9, 9)},
-            new Student(){name="Merveilles", firstname="Alice", age=12, startDate = new DateTime(2021, 9, 9)}
-    };
-    public IActionResult Index()
+    public class StudentController : Controller
     {
-        return View(StudentController.students);
+        // Creation d'une liste statique de Student
+        private static List<Student> students = new()
+        {
+            new() { AdmissionDate = new DateTime(2021, 9, 1), Age = 20, Firstname = "John", GPA = 3.5, Id = 1, Lastname = "Doe", Major = Major.CS },
+            new() { AdmissionDate = new DateTime(2021, 9, 1), Age = 20, Firstname = "John", GPA = 3.5, Id = 1, Lastname = "Doe", Major = Major.CS },
+            new() { AdmissionDate = new DateTime(2021, 9, 1), Age = 20, Firstname = "John", GPA = 3.5, Id = 1, Lastname = "Doe", Major = Major.CS },
+            new() { AdmissionDate = new DateTime(2021, 9, 1), Age = 20, Firstname = "John", GPA = 3.5, Id = 1, Lastname = "Doe", Major = Major.CS },
+        };
+        // GET: StudentController
+        public ActionResult Index()
+        {
+            return View(students);
+        }
+
     }
 }
