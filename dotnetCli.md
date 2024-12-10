@@ -53,3 +53,47 @@ balise html with razor
 <label asp-for="Propertie"> => pour ecrire le nom de la propertie ( ou le display )
 <input asp-for="Propertie"> => pour set une value a une propertie
  <span asp-validation-for="Propertie"> => Pour les messages d'erreur
+
+# BDD
+
+DBContext
+
+```c#
+builder.Services.AddDbContext<[ClasseDbContext]>(
+    options => options.UseSqlServer("chaine de connexion")
+)
+```
+
+création de la classe
+
+```c#
+using Microsoft.EntityFrameworkCore;
+
+namespace mvc.Data;
+
+//Cette classe permet de définir les tables de la BDD
+public class ApplicationDbContext : DBContext {
+
+    public ApplicationDbContext(DbContextOptions<ApplicatitonDbContext> options) : base(options){
+
+    }
+
+    // Créaton d'un dbset pour chaque table utilisé
+    // DbSet est une classe qui represente une table de la BDD
+    // Permet le mapping
+    public DbSet<Teacher> Teachers {get; set;}
+    public DbSet<Student> Students {get; set;}
+}
+```
+
+dotnet tool install --global dotnet-ef
+dotnet ef migrations add [MigrationName]
+dotnet ef database update
+
+## EntityFramework DbContext
+
+dans le controller
+
+```c#
+private readonly ApplicationDbContext _context;
+```

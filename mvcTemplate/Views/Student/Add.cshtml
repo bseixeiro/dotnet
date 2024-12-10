@@ -1,9 +1,10 @@
-@model Teacher
+@model Student
 
 @* Ceci est un commentaire en vue cshtml *@
-<h2>Ajouter un Nouveau Professeur</h2>
+<h2>Ajouter un Nouvel Étudiant</h2>
 
-<form asp-action="Add" asp-controller="Teacher" method="post">
+<form asp-action="Add" asp-controller="Student" method="post">
+        <input asp-for="Id" type="hidden" value="null"/>
     <div class="form-group">
         <label asp-for="Firstname"></label>
         <input asp-for="Firstname" class="form-control" />
@@ -26,7 +27,25 @@
         </select>
         <span asp-validation-for="Major" class="text-danger"></span>
     </div>
-    <button type="submit" class="btn btn-primary">Ajouter le Professeur</button>
+    <div class="form-group">
+        <label asp-for="AdmissionDate"></label>
+        <input asp-for="AdmissionDate" class="form-control datepicker" />
+        <span asp-validation-for="AdmissionDate" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Ajouter l'Étudiant</button>
 </form>
 
 <a asp-action="Index">Retour à la Liste</a>
+
+@section Scripts {
+    <script>
+        $(function () {
+            $(".datepicker").datepicker({
+                dateFormat: "yy-mm-dd",
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "1900:2015"
+            });
+        });
+    </script>
+}

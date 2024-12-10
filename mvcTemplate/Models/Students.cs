@@ -2,9 +2,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace mvc.Models;
 
-public class Teacher
+public enum Major
 {
-    [Required]
+    CS, IT, MATH, OTHER
+}
+
+public class Student
+{
+
     public int Id { get; set; }
 
     [Required(ErrorMessage = "Le prénom est obligatoire.")]
@@ -22,6 +27,14 @@ public class Teacher
     [Display(Name = "Âge")]
     public int Age { get; set; }
 
+    public double GPA { get; set; }
 
+    [Required(ErrorMessage = "Veuillez sélectionner une spécialité.")]
+    [Display(Name = "Spécialité")]
     public Major Major { get; set; }
+
+    [Required(ErrorMessage = "Veuillez sélectionner une date d'admission.")]
+    [DataType(DataType.Date)]
+    [Display(Name = "Date d'Admission")]
+    public DateTime AdmissionDate { get; set; }
 }

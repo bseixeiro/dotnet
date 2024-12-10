@@ -1,6 +1,6 @@
-@model Teacher
+@model Student
 
-<h2>Détails du Professeur @Model.Id</h2>
+<h2>Détails de l'Étudiant @Model.Id</h2>
 
 <dl class="row">
 
@@ -13,5 +13,10 @@
     <dt class="col-sm-2">Spécialité</dt>
     <dd class="col-sm-10">@Model.Major</dd>
 
+</dl>
+
+<dl>
+    <dt class="col-sm-2">Date d'admission</dt>
+    <dd class="col-sm-10">@Model.AdmissionDate.ToShortDateString()</dd>
 </dl>
 <a asp-action="Index">Retour à la Liste</a>

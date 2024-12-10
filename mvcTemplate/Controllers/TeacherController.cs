@@ -1,69 +1,121 @@
+using System.Reflection.Metadata.Ecma335;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.EntityFrameworkCore;
+using mvc.Data;
 using mvc.Models;
 
-public class TeacherController : Controller
+namespace mvc.Controllers
 {
-    // liste d'enseignants
-    private static List<Teacher> _teachers = new List<Teacher>
+    public class TeacherController : Controller
     {
-        new Teacher { Id = 1, Lastname = "Doe", Firstname = "John" },
-        new Teacher { Id = 2, Lastname = "Smith", Firstname = "Jane" }
-    };
+        private readonly ApplicationDbContext _context;
 
 
-    public IActionResult Index()
-    {
-        return View(_teachers);
-    }
+        // Constructeur 
+        public TeacherController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+        public async Task<IActionResult> ShowDetails(int? id)
+        {
+            if (id == null) return NotFound();
 
-    // Ecrire une liste d'Actions
+            var teacher = await _context.Teachers
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (teacher == null) return NotFound();
 
+            return View(teacher);
+        }
 
-    // Ajouter un Teacher
-    // Accessible via /Teacher/Add en GET affichera le formulaire
-    [HttpGet]
-    public IActionResult Add()
-    {
-        return View();
-    }
-
-    // Accessible via /Teacher/Add en POST ajoutera le teacher
-    [HttpPost]
-    public IActionResult Add(Teacher teacher)
-    {
-        // Declencher le mecanisme de validation
-        if (!ModelState.IsValid)
+        // GET: Teachers/Add
+        public IActionResult Add()
         {
             return View();
         }
-        // Ajouter le teacher
-        _teachers.Add(teacher);
-        return RedirectToAction("Index");
-    }
 
-    // Supprimer un Teacher
 
-    // Afficher le détail d'un teacher
-    // Accessible via /Teacher/ShowDetails/10
-    public IActionResult ShowDetails(int id)
-    {
-        Teacher teacher = new Teacher();
-        if (id == 10)
+        // POST: Teachers/Add
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Add(Teacher teacher)
         {
-            teacher.Firstname = "John";
-            teacher.Lastname = "Doe";
-            teacher.Id = 10;
+            if (ModelState.IsValid)
+            {
+                _context.Add(teacher);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(teacher);
         }
-        else
+
+        // GET: Teachers/Delete/Id
+        public async Task<IActionResult> Delete(int? id)
         {
-            teacher.Firstname = "Jane";
-            teacher.Lastname = "Smith";
-            teacher.Id = 20;
+            if (id == null) return NotFound();
+
+            var teacher = await _context.Teachers
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (teacher == null) return NotFound();
+
+            return View(teacher);
         }
-        return View(teacher);
+
+        // POST: Teachers/Delete/Id
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var teacher = await _context.Teachers.FindAsync(id);
+            _context.Teachers.Remove(teacher);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Teachers/Edit/Id
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var teacher = await _context.Teachers.FindAsync(id);
+            if (teacher == null) return NotFound();
+
+            return View(teacher);
+        }
+
+        // POST: Teachers/Edit/ID
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Teacher teacher)
+        {
+            if (id != teacher.Id) return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(teacher);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!TeacherExists(teacher.Id)) return NotFound();
+                    else throw;
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(teacher);
+        }
+
+        private bool TeacherExists(int id)
+        {
+            return _context.Teachers.Any(e => e.Id == id);
+        }
+
+        // Get teachers
+        public async Task<ActionResult> Index()
+        {
+            return View(await _context.Teachers.ToListAsync());
+        }
+
     }
-
-    // Afficher tous les Teachers
-
 }
