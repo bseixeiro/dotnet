@@ -1,11 +1,12 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace mvc.Models;
 
-public class Teacher
+public class Teacher : IdentityUser
 {
-    [Required]
-    public int Id { get; set; }
+    // [Required]
+    // public int Id { get; set; }
 
     [Required(ErrorMessage = "Le prénom est obligatoire.")]
     [StringLength(20, MinimumLength = 2)]
