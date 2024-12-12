@@ -14,12 +14,10 @@ public class AccountController : Controller
         _userManager = userManager;
     }
 
-    [HttpGet]
     public IActionResult Register()
     {
         return View();
     }
-
 
     [HttpPost]
     public async Task<IActionResult> Register(AccountViewModel model)
@@ -31,10 +29,11 @@ public class AccountController : Controller
 
         var user = new Teacher
         {
-            UserName = model.Email,
+            UserName = model.Lastname + model.Firstname,
             Email = model.Email,
             Firstname = model.Firstname,
             Lastname = model.Lastname,
+            Major = "",
         };
 
         var result = await _userManager.CreateAsync(user, model.Password);
@@ -49,6 +48,44 @@ public class AccountController : Controller
         {
             ModelState.AddModelError(string.Empty, error.Description);
         }
+
+        return View(model);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Logout()
+    {
+        await _signInManager.SignOutAsync();
+        return RedirectToAction("IndexAccount");
+    }
+
+    public IActionResult IndexAccount()
+    {
+        return View();
+    }
+
+    public IActionResult Login()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Login(LoginViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+        var user = await _userManager.FindByEmailAsync(model.Email);
+        Console.WriteLine(user);
+        var result = await _signInManager.PasswordSignInAsync(user?.UserName!, model.Password, false, false);
+
+        if (result.Succeeded)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+
+        ModelState.AddModelError(string.Empty, "Erreur lors de la connexion");
 
         return View(model);
     }

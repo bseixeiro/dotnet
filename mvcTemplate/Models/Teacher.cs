@@ -24,5 +24,5 @@ public class Teacher : IdentityUser
     public int Age { get; set; }
 
 
-    public Major Major { get; set; }
+    public string Major { get; set; }
 }
