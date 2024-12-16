@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using mvc.Data;
-using mvc.Models;
+using mvc.Models.Student;
 using mvc.Models.Teacher;
 
 var builder = WebApplication.CreateBuilder(args);

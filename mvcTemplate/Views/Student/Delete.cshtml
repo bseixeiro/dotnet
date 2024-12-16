@@ -1,23 +1,62 @@
+@using mvc.Models.Student
 @model Student
 
-<!-- <h2>Supprimer l'Étudiant</h2>
+@{
+    ViewData["Title"] = "Supprimer l'Étudiant";
+}
 
-<h3>Êtes-vous sûr de vouloir supprimer cet étudiant ?</h3>
-<div>
-    <h4>Détails de l'Étudiant</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">Nom</dt>
-        <dd class="col-sm-10">@Model.Firstname @Model.Lastname</dd>
-        <dt class="col-sm-2">Âge</dt>
-        <dd class="col-sm-10">@Model.Age</dd>
-        <dt class="col-sm-2">Spécialité</dt>
-        <dd class="col-sm-10">@Model.Major</dd>
-    </dl>
+<div class="container mt-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-danger text-white text-center">
+            <h2>
+                <i class="fas fa-exclamation-triangle"></i> Supprimer l'Étudiant
+            </h2>
+        </div>
+        <div class="card-body">
+            <h3 class="text-center text-danger mb-4">
+                Êtes-vous sûr de vouloir supprimer cet étudiant ?
+            </h3>
 
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Supprimer" class="btn btn-danger" />
-        <a asp-action="Index" class="btn btn-secondary">Annuler</a>
-    </form>
-</div> -->
+            <div class="text-center">
+                <h4 class="text-secondary">Détails de l'Étudiant</h4>
+                <hr class="w-50 mx-auto mb-4" />
+            </div>
+
+            <dl class="row justify-content-center">
+                <dt class="col-sm-3 text-right font-weight-bold">Nom :</dt>
+                <dd class="col-sm-7">@Model.Firstname @Model.Lastname</dd>
+
+                <dt class="col-sm-3 text-right font-weight-bold">Âge :</dt>
+                <dd class="col-sm-7">@Model.Age</dd>
+
+                <dt class="col-sm-3 text-right font-weight-bold">Spécialité :</dt>
+                <dd class="col-sm-7">@Model.Major</dd>
+
+                <dt class="col-sm-3 text-right font-weight-bold">Email :</dt>
+                <dd class="col-sm-7">@Model.Email</dd>
+
+                <dt class="col-sm-3 text-right font-weight-bold">Date d'Admission :</dt>
+                <dd class="col-sm-7">@Model.AdmissionDate.ToString("dd/MM/yyyy")</dd>
+
+                <dt class="col-sm-3 text-right font-weight-bold">Moyenne (GPA) :</dt>
+                <dd class="col-sm-7">@Model.GPA</dd>
+            </dl>
+
+            <form asp-action="Delete" method="post" class="mt-4">
+                <input type="hidden" asp-for="Id" />
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-danger btn-lg mr-2">
+                        <i class="fas fa-trash"></i> Supprimer
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-times"></i> Annuler
+                    </a>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer text-center text-muted">
+            Attention : Cette action est irréversible.
+        </div>
+    </div>
+</div>

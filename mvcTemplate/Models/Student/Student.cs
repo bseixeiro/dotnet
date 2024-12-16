@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace mvc.Models;
+namespace mvc.Models.Student;
 
 public class Student : Account
 {

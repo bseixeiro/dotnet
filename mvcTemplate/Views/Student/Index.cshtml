@@ -1,42 +1,56 @@
+@using mvc.Models.Student
 @model IEnumerable<Student>
 
+<h1 class="text-center my-4 text-primary">Étudiants</h1>
 
-<!-- <h1>KAKOU KAKOU !</h1>
+<p class="text-center mb-4">Voici les informations des étudiants :</p>
 
-<p>Voici les infos de l'élève :</p>
-<ul>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nom</th>
-                    <th>Âge</th>
-                    <th>Spécialité</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-        @foreach (var student in Model) {
+<div class="container">
+    <table class="table table-hover table-bordered text-center shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Prénom</th>
+                <th>Nom</th>
+                <th>Âge</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var student in Model)
+            {
                 <tr>
                     <td>@student.Id</td>
-                    <td>@student.Firstname @student.Lastname</td>
+                    <td>@student.Firstname</td>
+                    <td>@student.Lastname</td>
                     <td>@student.Age</td>
-                    <td>@student.Major</td>
+                    <td>@student.Email</td>
                     <td>
-                        <a asp-action="ShowDetails" asp-route-id="@student.Id" class="me-2" title="Détails">
-                            <i class="bi bi-info-square"></i>
+                        <a asp-action="Details" asp-route-id="@student.Id" class="btn btn-info btn-sm me-2" title="Voir les détails">
+                            <i class="bi bi-eye"></i> Détails
                         </a>
-                        <a asp-action="Edit" asp-route-id="@student.Id" class="btn btn-warning btn-sm me-2" title="Modifier">
-                            <i class="bi bi-pencil-square"></i>
-                        </a>
-                        <a asp-action="Delete" asp-route-id="@student.Id" class="text-danger" title="Supprimer">
-                            <i class="bi bi-trash"></i>
-                        </a>
+                        @if (User.IsInRole("Teacher"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@student.Id" class="btn btn-warning btn-sm me-2" title="Modifier">
+                                <i class="bi bi-pencil-square"></i> Modifier
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@student.Id" class="text-danger" title="Supprimer" onclick="return confirm('Voulez-vous vraiment supprimer cet étudiant ?')">
+                                <i class="bi bi-trash fs-5"></i>
+                            </a>
+                        }
                     </td>
                 </tr>
-        }
-            </tbody>
-        </table>
-</ul>
+            }
+        </tbody>
+    </table>
 
-<a asp-area="" asp-controller="Student" asp-action="Add" class="btn btn-primary">Ajouter</a> -->
+    <div class="d-flex justify-content-center mt-4">
+        @if (User.IsInRole("Teacher"))
+        {
+            <a asp-area="" asp-controller="Student" asp-action="Create" class="btn btn-primary shadow">
+                <i class="bi bi-plus-circle"></i> Ajouter un Étudiant
+            </a>
+        }
+    </div>
+</div>

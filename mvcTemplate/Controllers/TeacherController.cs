@@ -156,7 +156,7 @@ namespace mvc.Controllers
                     else throw;
                 }
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "Teacher");
             }
 
             return View(model);

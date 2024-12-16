@@ -20,31 +20,16 @@ public class HomeController : Controller
         _userManager = userManager;
     }
 
+    [AllowAnonymous]
     public async Task<IActionResult> Index()
     {
         var user = await _userManager.GetUserAsync(User);
 
         if (user != null )
         {
-            return RedirectToAction("Details", "Home");
+            return RedirectToAction("Index", "Event");
         }
         return View();
-    }
-
-    [Authorize]
-    public async Task<IActionResult> Details()
-    {
-        var user = await _userManager.GetUserAsync(User);
-
-       DetailsViewModel model = new DetailsViewModel()
-       {
-           Lastname = user.Lastname,
-           Firstname = user.Firstname,
-           Age = user.Age,
-           Email = user.Email
-       };
-
-        return View(model);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

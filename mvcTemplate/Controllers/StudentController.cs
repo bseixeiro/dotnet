@@ -1,121 +1,196 @@
-// using System.Reflection.Metadata.Ecma335;
-// using Microsoft.AspNetCore.Mvc;
-// using Microsoft.EntityFrameworkCore;
-// using mvc.Data;
-// using mvc.Models;
+using System.Reflection.Metadata.Ecma335;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using mvc.Data;
+using mvc.Models.Student;
 
-// namespace mvc.Controllers
-// {
-//     public class StudentController : Controller
-//     {
-//         private readonly ApplicationDbContext _context;
+namespace mvc.Controllers
+{
+    [Authorize]
+    public class StudentController : Controller
+    {
+        private readonly ApplicationDbContext _context;
 
-
-//         // Constructeur 
-//         public StudentController(ApplicationDbContext context)
-//         {
-//             _context = context;
-//         }
-//         public async Task<IActionResult> ShowDetails(int? id)
-//         {
-//             if (id == null) return NotFound();
-
-//             var student = await _context.Students
-//                 .FirstOrDefaultAsync(m => m.Id == id);
-//             if (student == null) return NotFound();
-
-//             return View(student);
-//         }
-
-//         // GET: Students/Add
-//         public IActionResult Add()
-//         {
-//             return View();
-//         }
+        private readonly UserManager<Student> _userManager; 
 
 
-//         // POST: Students/Add
-//         [HttpPost]
-//         [ValidateAntiForgeryToken]
-//         public async Task<IActionResult> Add(Student student)
-//         {
-//             if (ModelState.IsValid)
-//             {
-//                 _context.Add(student);
-//                 await _context.SaveChangesAsync();
-//                 return RedirectToAction(nameof(Index));
-//             }
-//             return View(student);
-//         }
+        // Constructeur 
+        public StudentController(ApplicationDbContext context, UserManager<Student> userManager)
+        {
+            _context = context;
+            _userManager = userManager;
+        }
 
-//         // GET: Students/Delete/Id
-//         public async Task<IActionResult> Delete(int? id)
-//         {
-//             if (id == null) return NotFound();
+        public async Task<IActionResult> Index()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user != null && User.IsInRole("Student"))
+                return RedirectToAction("Details", "Student", new { id = user.Id });
 
-//             var student = await _context.Students
-//                 .FirstOrDefaultAsync(m => m.Id == id);
-//             if (student == null) return NotFound();
+            var students = await _context.Students.ToListAsync();
+            return View(students);
+        }
 
-//             return View(student);
-//         }
+        [Authorize(Roles = "Teacher")]
+        public IActionResult Create()
+        {
+            return View();
+        }
 
-//         // POST: Students/Delete/Id
-//         [HttpPost, ActionName("Delete")]
-//         [ValidateAntiForgeryToken]
-//         public async Task<IActionResult> DeleteConfirmed(int id)
-//         {
-//             var student = await _context.Students.FindAsync(id);
-//             _context.Students.Remove(student);
-//             await _context.SaveChangesAsync();
-//             return RedirectToAction(nameof(Index));
-//         }
 
-//         // GET: Students/Edit/Id
-//         public async Task<IActionResult> Edit(int? id)
-//         {
-//             if (id == null) return NotFound();
+        // POST: Student/Create
+        [Authorize(Roles = "Teacher")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(CreateViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
 
-//             var student = await _context.Students.FindAsync(id);
-//             if (student == null) return NotFound();
+            var user = new Student
+            {
+                UserName = model.Lastname + model.Firstname,
+                Email = model.Email,
+                Firstname = model.Firstname,
+                Lastname = model.Lastname,
+                Age = model.Age,
+                Major = model.Major,
+                AdmissionDate = model.AdmissionDate,
+                GPA = 0.0,
+            };
 
-//             return View(student);
-//         }
+            var result = await _userManager.CreateAsync(user, model.Password);
 
-//         // POST: Students/Edit/ID
-//         [HttpPost]
-//         [ValidateAntiForgeryToken]
-//         public async Task<IActionResult> Edit(int id, Student student)
-//         {
-//             if (id != student.Id) return NotFound();
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRolesAsync(user, ["Student"]);
+                return RedirectToAction("Index", "Student");
+            }
 
-//             if (ModelState.IsValid)
-//             {
-//                 try
-//                 {
-//                     _context.Update(student);
-//                     await _context.SaveChangesAsync();
-//                 }
-//                 catch (DbUpdateConcurrencyException)
-//                 {
-//                     if (!StudentExists(student.Id)) return NotFound();
-//                     else throw;
-//                 }
-//                 return RedirectToAction(nameof(Index));
-//             }
-//             return View(student);
-//         }
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
 
-//         private bool StudentExists(int id)
-//         {
-//             return _context.Students.Any(e => e.Id == id);
-//         }
+            return View(model);
+        }
 
-//         // Get students
-//         public async Task<ActionResult> Index()
-//         {
-//             return View(await _context.Students.ToListAsync());
-//         }
+        public async Task<IActionResult> Details(string id)
+        {
+            var student = await _context.Students.FindAsync(id);
+            if (student == null)
+            {
+                return NotFound();
+            }
 
-//     }
-// }
+            var viewModel = new DetailsViewModel
+            {
+                Id = student.Id,
+                Firstname = student.Firstname,
+                Lastname = student.Lastname,
+                Age = student.Age,
+                Major = student.Major,
+                AdmissionDate = student.AdmissionDate,
+                Email = student.Email,
+                GPA = student.GPA
+            };
+
+            return View(viewModel);
+        }
+
+        [Authorize(Roles = "Teacher")]
+        public async Task<IActionResult> Edit(string? id)
+        {
+            if (id == null) return NotFound();
+
+            var student = await _context.Students.FindAsync(id);
+            if (student == null) return NotFound();
+
+            EditViewModel model = new EditViewModel()
+            {
+                Id = student.Id,
+                Firstname = student.Firstname,
+                Lastname = student.Lastname,
+                Email = student.Email,
+                Age = student.Age,
+                Major = student.Major,
+                AdmissionDate = student.AdmissionDate,
+                GPA = student.GPA
+
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Teacher")]
+        public async Task<IActionResult> Edit(string id, EditViewModel model)
+        {
+            if (id != model.Id) return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var student = await _userManager.FindByIdAsync(model.Id);
+                    if (student == null) return NotFound();
+
+                    student.Firstname = model.Firstname;
+                    student.Lastname = model.Lastname;
+                    student.Age = model.Age;
+                    student.Major = model.Major;
+                    student.AdmissionDate = model.AdmissionDate;
+                    student.Email = model.Email;
+                    student.GPA = model.GPA;
+                    student.UserName = model.Lastname + model.Firstname;
+
+
+                    var result = await _userManager.UpdateAsync(student);
+
+                    if (!result.Succeeded)
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
+                        return View(model);
+                    }
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                     throw;
+                }
+
+                return RedirectToAction("Index", "Student");
+            }
+
+            return View(model);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Teacher")]
+        public async Task<IActionResult> DeleteConfirmed(string id)
+        {
+            var student = await _context.Students.FindAsync(id);
+            await _userManager.DeleteAsync(student);
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Delete(string? id)
+        {
+            if (id == null) return NotFound();
+
+            var student = await _context.Students
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (student == null) return NotFound();
+
+            return View(student);
+        }
+
+    }
+}

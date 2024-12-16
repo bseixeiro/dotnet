@@ -228,6 +228,41 @@ namespace mvc.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("mvc.Models.Event.Event", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("EventDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MaxParticipants")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Events");
+                });
+
             modelBuilder.Entity("mvc.Models.Student", b =>
                 {
                     b.HasBaseType("Account");
@@ -245,7 +280,7 @@ namespace mvc.Migrations
                     b.ToTable("Students", (string)null);
                 });
 
-            modelBuilder.Entity("mvc.Models.Teacher", b =>
+            modelBuilder.Entity("mvc.Models.Teacher.Teacher", b =>
                 {
                     b.HasBaseType("Account");
 
@@ -316,11 +351,11 @@ namespace mvc.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("mvc.Models.Teacher", b =>
+            modelBuilder.Entity("mvc.Models.Teacher.Teacher", b =>
                 {
                     b.HasOne("Account", null)
                         .WithOne()
-                        .HasForeignKey("mvc.Models.Teacher", "Id")
+                        .HasForeignKey("mvc.Models.Teacher.Teacher", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

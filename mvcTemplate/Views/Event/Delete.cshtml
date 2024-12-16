@@ -1,0 +1,39 @@
+﻿@model mvc.Models.Event.DetailsViewModel
+
+@{
+    ViewData["Title"] = "Supprimer l'Événement";
+}
+
+<div class="container my-5">
+    <div class="card shadow-sm border-danger">
+        <div class="card-header bg-danger text-white">
+            <h3 class="mb-0"><i class="bi bi-trash"></i> Supprimer l'Événement</h3>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning d-flex align-items-center" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2 fs-4"></i>
+                <h5 class="mb-0">Êtes-vous sûr de vouloir supprimer cet événement ?</h5>
+            </div>
+
+            <div class="mb-4">
+                <ul class="list-unstyled">
+                    <li><strong><i class="bi bi-card-heading"></i> Titre :</strong> @Model.Title</li>
+                    <li><strong><i class="bi bi-calendar"></i> Date :</strong> @Model.EventDate.ToString("f")</li>
+                    <li><strong><i class="bi bi-geo-alt"></i> Lieu :</strong> @Model.Location</li>
+                </ul>
+            </div>
+
+            <form asp-action="Delete" method="post">
+                <input type="hidden" asp-for="Id" />
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Annuler
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash-fill"></i> Supprimer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
