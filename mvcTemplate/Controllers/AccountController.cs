@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using mvc.Models.Teacher;
 using mvc.Models;
 
 public class AccountController : Controller
@@ -12,6 +13,12 @@ public class AccountController : Controller
     {
         _signInManager = signInManager;
         _userManager = userManager;
+    }
+
+    [HttpGet]
+    public IActionResult AccessDenied()
+    {
+        return View();
     }
 
     public IActionResult Register()
@@ -58,12 +65,7 @@ public class AccountController : Controller
     public async Task<IActionResult> Logout()
     {
         await _signInManager.SignOutAsync();
-        return RedirectToAction("IndexAccount");
-    }
-
-    public IActionResult IndexAccount()
-    {
-        return View();
+        return RedirectToAction("Index", "Home");
     }
 
     public IActionResult Login()

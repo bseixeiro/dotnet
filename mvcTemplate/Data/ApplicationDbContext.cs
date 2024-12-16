@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using mvc.Models;
+using mvc.Models.Teacher;
 
 namespace mvc.Data;
 

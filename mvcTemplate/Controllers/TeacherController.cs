@@ -1,9 +1,10 @@
 using System.Reflection.Metadata.Ecma335;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using mvc.Data;
-using mvc.Models;
+using mvc.Models.Teacher;
 
 namespace mvc.Controllers
 {
@@ -11,23 +12,14 @@ namespace mvc.Controllers
     public class TeacherController : Controller
     {
         private readonly ApplicationDbContext _context;
-
+        private readonly UserManager<Teacher> _userManager;
 
         // Constructeur 
-        public TeacherController(ApplicationDbContext context)
+        public TeacherController(ApplicationDbContext context, UserManager<Teacher> userManager)
         {
             _context = context;
-        }
-        public async Task<IActionResult> ShowDetails(string? id)
-        {
-            if (id == null) return NotFound();
-
-            var teacher = await _context.Teachers
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (teacher == null) return NotFound();
-
-            return View(teacher);
-        }
+            _userManager = userManager;
+        }   
 
         // GET: Teachers/Add
         public IActionResult Add()
@@ -39,15 +31,37 @@ namespace mvc.Controllers
         // POST: Teachers/Add
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add(Teacher teacher)
+        public async Task<IActionResult> Add(AddViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Add(teacher);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return View(model);
             }
-            return View(teacher);
+
+            var user = new Teacher
+            {
+                UserName = model.Lastname + model.Firstname,
+                Email = model.Email,
+                Firstname = model.Firstname,
+                Lastname = model.Lastname,
+                Age = model.Age,
+                Major = model.Major,
+            };
+
+            var result = await _userManager.CreateAsync(user, model.Password);
+
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRolesAsync(user, ["Teacher"]);
+                return RedirectToAction("Index", "Home");
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            return View(model);
         }
 
         // GET: Teachers/Delete/Id
@@ -65,48 +79,89 @@ namespace mvc.Controllers
         // POST: Teachers/Delete/Id
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var teacher = await _context.Teachers.FindAsync(id);
-            _context.Teachers.Remove(teacher);
-            await _context.SaveChangesAsync();
+            await _userManager.DeleteAsync(teacher);
             return RedirectToAction(nameof(Index));
         }
 
         // GET: Teachers/Edit/Id
         public async Task<IActionResult> Edit(string? id)
         {
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            if (id != currentUser.Id)
+            {
+                return Forbid();
+            }
+
             if (id == null) return NotFound();
 
             var teacher = await _context.Teachers.FindAsync(id);
             if (teacher == null) return NotFound();
 
-            return View(teacher);
+            EditViewModel model = new EditViewModel()
+            {
+                Id = teacher.Id,
+                Firstname = teacher.Firstname,
+                Lastname = teacher.Lastname,
+                Email = teacher.Email,
+                Age = teacher.Age,
+                Major = teacher.Major,
+            };
+            return View(model);
         }
 
-        // POST: Teachers/Edit/ID
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, Teacher teacher)
+        [Authorize]
+        public async Task<IActionResult> Edit(string id, EditViewModel model)
         {
-            if (id != teacher.Id) return NotFound();
+            if (id != model.Id) return NotFound();
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(teacher);
-                    await _context.SaveChangesAsync();
+                    var teacher = await _userManager.FindByIdAsync(model.Id);
+                    if (teacher == null) return NotFound();
+
+                    teacher.Lastname = model.Lastname;
+                    teacher.Firstname = model.Firstname;
+                    teacher.Email = model.Email;
+                    teacher.Major = model.Major;
+                    teacher.Age = model.Age;
+                    teacher.UserName = model.Lastname + model.Firstname;
+
+                    var result = await _userManager.UpdateAsync(teacher);
+
+                    if (!result.Succeeded)
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
+                        return View(model);
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TeacherExists(teacher.Id)) return NotFound();
+                    if (!TeacherExists(model.Id)) return NotFound();
                     else throw;
                 }
+
                 return RedirectToAction(nameof(Index));
             }
-            return View(teacher);
+
+            return View(model);
         }
+
 
         private bool TeacherExists(string id)
         {

@@ -1,0 +1,32 @@
+﻿@{
+    ViewData["Title"] = "Accès Refusé";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="text-center">
+                <!-- Icône Bootstrap pour un look stylé -->
+                <i class="bi bi-lock-fill text-danger" style="font-size: 4rem;"></i>
+                <h1 class="text-danger mt-3 fw-bold">Accès Refusé</h1>
+                <p class="lead mt-3">
+                    <strong>Vous n'êtes pas autorisé à accéder à cette page.</strong>
+                </p>
+
+                <p class="mt-2">
+                    Si vous pensez qu'il s'agit d'une erreur, veuillez contacter l'administrateur.
+                </p>
+
+                <!-- Boutons pour retourner à la page d'accueil ou se reconnecter -->
+                <div class="mt-4">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-primary px-4 me-2">
+                        <i class="bi bi-house-door-fill"></i> Retour à l'accueil
+                    </a>
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-secondary px-4">
+                        <i class="bi bi-box-arrow-in-right"></i> Se reconnecter
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

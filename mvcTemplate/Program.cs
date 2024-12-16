@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using mvc.Data;
 using mvc.Models;
+using mvc.Models.Teacher;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<ApplicationDbContext>(
-    options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
 //builder.Services.AddIdentity<Account, IdentityRole>(options =>
@@ -28,6 +29,13 @@ builder.Services.AddDefaultIdentity<Account>().AddRoles<IdentityRole>().AddEntit
 
 builder.Services.AddIdentityCore<Teacher>().AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddIdentityCore<Student>().AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+    options.SlidingExpiration = true;
+});
 
 var app = builder.Build();
 
@@ -51,5 +59,20 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-    
+
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    string[] roleNames = { "Teacher", "Student" };
+
+    foreach (var roleName in roleNames)
+    {
+        if (!await roleManager.RoleExistsAsync(roleName))
+        {
+            await roleManager.CreateAsync(new IdentityRole(roleName));
+        }
+    }
+}
+
 app.Run();

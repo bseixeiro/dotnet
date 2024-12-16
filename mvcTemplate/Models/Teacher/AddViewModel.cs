@@ -1,0 +1,33 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace mvc.Models.Teacher
+{
+    public class AddViewModel
+    {
+        [Required(ErrorMessage = "Le prénom est obligatoire.")]
+        [StringLength(20, MinimumLength = 2)]
+        [Display(Name = "Prénom")]
+        public string Firstname { get; set; }
+
+        [Required(ErrorMessage = "Le nom de famille est obligatoire.")]
+        [StringLength(20, MinimumLength = 2)]
+        [Display(Name = "Nom")]
+        public string Lastname { get; set; }
+
+        [Range(16, 100, ErrorMessage = "L'âge doit être compris entre 16 et 100 ans..")]
+        [Required]
+        [Display(Name = "Âge")]
+        public int Age { get; set; }
+
+        [Display(Name = "Spécialité")]
+        public string Major {  get; set; }
+
+        [EmailAddress]
+        [Required]
+        public string Email {  get; set; }
+
+        [Required]
+        [Display(Name = "Mot de passe")]
+        public string Password { get; set; }
+    }
+}
