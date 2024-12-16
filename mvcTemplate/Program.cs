@@ -24,10 +24,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(
 //    options.User.RequireUniqueEmail = true;
 //}).AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddDefaultIdentity<Account>().AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddDefaultIdentity<Account>().AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddIdentityCore<Teacher>().AddEntityFrameworkStores<ApplicationDbContext>();
-builder.Services.AddIdentityCore<Student>().AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddIdentityCore<Teacher>().AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddIdentityCore<Student>().AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 
 var app = builder.Build();
 
@@ -51,5 +51,5 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
+    
 app.Run();

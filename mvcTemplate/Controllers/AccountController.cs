@@ -4,11 +4,11 @@ using mvc.Models;
 
 public class AccountController : Controller
 {
-    private readonly SignInManager<Teacher> _signInManager;
+    private readonly SignInManager<Account> _signInManager;
 
-    private readonly UserManager<Teacher> _userManager;
+    private readonly UserManager<Account> _userManager;
 
-    public AccountController(SignInManager<Teacher> signInManager, UserManager<Teacher> userManager)
+    public AccountController(SignInManager<Account> signInManager, UserManager<Account> userManager)
     {
         _signInManager = signInManager;
         _userManager = userManager;
@@ -33,13 +33,15 @@ public class AccountController : Controller
             Email = model.Email,
             Firstname = model.Firstname,
             Lastname = model.Lastname,
-            Age = model.Age
+            Age = model.Age,
+            Major = ""
         };
 
         var result = await _userManager.CreateAsync(user, model.Password);
 
         if (result.Succeeded)
         {
+            await _userManager.AddToRolesAsync(user, ["Teacher"]);
             await _signInManager.SignInAsync(user, isPersistent: false);
             return RedirectToAction("Index", "Home");
         }
@@ -77,7 +79,6 @@ public class AccountController : Controller
             return View(model);
         }
         var user = await _userManager.FindByEmailAsync(model.Email);
-        Console.WriteLine(user);
         var result = await _signInManager.PasswordSignInAsync(user?.UserName!, model.Password, false, false);
 
         if (result.Succeeded)

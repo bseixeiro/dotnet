@@ -1,121 +1,123 @@
-// using System.Reflection.Metadata.Ecma335;
-// using Microsoft.AspNetCore.Mvc;
-// using Microsoft.EntityFrameworkCore;
-// using mvc.Data;
-// using mvc.Models;
+using System.Reflection.Metadata.Ecma335;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using mvc.Data;
+using mvc.Models;
 
-// namespace mvc.Controllers
-// {
-//     public class TeacherController : Controller
-//     {
-//         private readonly ApplicationDbContext _context;
-
-
-//         // Constructeur 
-//         public TeacherController(ApplicationDbContext context)
-//         {
-//             _context = context;
-//         }
-//         public async Task<IActionResult> ShowDetails(int? id)
-//         {
-//             if (id == null) return NotFound();
-
-//             var teacher = await _context.Teachers
-//                 .FirstOrDefaultAsync(m => m.Id == id);
-//             if (teacher == null) return NotFound();
-
-//             return View(teacher);
-//         }
-
-//         // GET: Teachers/Add
-//         public IActionResult Add()
-//         {
-//             return View();
-//         }
+namespace mvc.Controllers
+{
+    [Authorize(Roles ="Teacher")]
+    public class TeacherController : Controller
+    {
+        private readonly ApplicationDbContext _context;
 
 
-//         // POST: Teachers/Add
-//         [HttpPost]
-//         [ValidateAntiForgeryToken]
-//         public async Task<IActionResult> Add(Teacher teacher)
-//         {
-//             if (ModelState.IsValid)
-//             {
-//                 _context.Add(teacher);
-//                 await _context.SaveChangesAsync();
-//                 return RedirectToAction(nameof(Index));
-//             }
-//             return View(teacher);
-//         }
+        // Constructeur 
+        public TeacherController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+        public async Task<IActionResult> ShowDetails(string? id)
+        {
+            if (id == null) return NotFound();
 
-//         // GET: Teachers/Delete/Id
-//         public async Task<IActionResult> Delete(int? id)
-//         {
-//             if (id == null) return NotFound();
+            var teacher = await _context.Teachers
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (teacher == null) return NotFound();
 
-//             var teacher = await _context.Teachers
-//                 .FirstOrDefaultAsync(m => m.Id == id);
-//             if (teacher == null) return NotFound();
+            return View(teacher);
+        }
 
-//             return View(teacher);
-//         }
+        // GET: Teachers/Add
+        public IActionResult Add()
+        {
+            return View();
+        }
 
-//         // POST: Teachers/Delete/Id
-//         [HttpPost, ActionName("Delete")]
-//         [ValidateAntiForgeryToken]
-//         public async Task<IActionResult> DeleteConfirmed(int id)
-//         {
-//             var teacher = await _context.Teachers.FindAsync(id);
-//             _context.Teachers.Remove(teacher);
-//             await _context.SaveChangesAsync();
-//             return RedirectToAction(nameof(Index));
-//         }
 
-//         // GET: Teachers/Edit/Id
-//         public async Task<IActionResult> Edit(int? id)
-//         {
-//             if (id == null) return NotFound();
+        // POST: Teachers/Add
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Add(Teacher teacher)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Add(teacher);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(teacher);
+        }
 
-//             var teacher = await _context.Teachers.FindAsync(id);
-//             if (teacher == null) return NotFound();
+        // GET: Teachers/Delete/Id
+        public async Task<IActionResult> Delete(string? id)
+        {
+            if (id == null) return NotFound();
 
-//             return View(teacher);
-//         }
+            var teacher = await _context.Teachers
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (teacher == null) return NotFound();
 
-//         // POST: Teachers/Edit/ID
-//         [HttpPost]
-//         [ValidateAntiForgeryToken]
-//         public async Task<IActionResult> Edit(int id, Teacher teacher)
-//         {
-//             if (id != teacher.Id) return NotFound();
+            return View(teacher);
+        }
 
-//             if (ModelState.IsValid)
-//             {
-//                 try
-//                 {
-//                     _context.Update(teacher);
-//                     await _context.SaveChangesAsync();
-//                 }
-//                 catch (DbUpdateConcurrencyException)
-//                 {
-//                     if (!TeacherExists(teacher.Id)) return NotFound();
-//                     else throw;
-//                 }
-//                 return RedirectToAction(nameof(Index));
-//             }
-//             return View(teacher);
-//         }
+        // POST: Teachers/Delete/Id
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var teacher = await _context.Teachers.FindAsync(id);
+            _context.Teachers.Remove(teacher);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
 
-//         private bool TeacherExists(int id)
-//         {
-//             return _context.Teachers.Any(e => e.Id == id);
-//         }
+        // GET: Teachers/Edit/Id
+        public async Task<IActionResult> Edit(string? id)
+        {
+            if (id == null) return NotFound();
 
-//         // Get teachers
-//         public async Task<ActionResult> Index()
-//         {
-//             return View(await _context.Teachers.ToListAsync());
-//         }
+            var teacher = await _context.Teachers.FindAsync(id);
+            if (teacher == null) return NotFound();
 
-//     }
-// }
+            return View(teacher);
+        }
+
+        // POST: Teachers/Edit/ID
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(string id, Teacher teacher)
+        {
+            if (id != teacher.Id) return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(teacher);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!TeacherExists(teacher.Id)) return NotFound();
+                    else throw;
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(teacher);
+        }
+
+        private bool TeacherExists(string id)
+        {
+            return _context.Teachers.Any(e => e.Id == id);
+        }
+
+        // Get teachers
+        public async Task<ActionResult> Index()
+        {
+            return View(await _context.Teachers.ToListAsync());
+        }
+
+    }
+}
